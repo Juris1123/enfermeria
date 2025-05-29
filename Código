@@ -1,0 +1,403 @@
+const CentrosProductividad = "12Y7F0j9o7CkFMukKfgK5ZuyLdBd9jzbgs3DlrnTOn8E";
+const ProductividadEnfermeras = "1Rm-tTsJ5xSp-sGpl4z7LhjR-Nlx979wf3sHJe7L3Iy4";
+
+function doGet(e) {
+  const page = e.parameter.page;
+  let output;
+  output = HtmlService.createTemplateFromFile(page || 'Index');
+  return output.evaluate()
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .setFaviconUrl("https://i.ibb.co/vCpzPcZG/4434722.png")
+    .setTitle("Coordinación Enfermería");
+}
+
+function includefile(e) {
+  return HtmlService.createTemplateFromFile(e).evaluate().getContent();
+}
+
+function myURL() {
+  return ScriptApp.getService().getUrl();
+}
+
+const CENTRO_COL_MAP = {
+  "CENTRO DE SALUD ACATLIPA": 3,
+  "CENTRO DE SALUD AHUATEPEC": 4,
+  "CENTRO DE SALUD ALPUYECA": 5,
+  "CENTRO DE SALUD ALTA PALMIRA": 6,
+  "CENTRO DE SALUD ALTA VISTA": 7,
+  "CENTRO DE SALUD AMATLÁN DE QUETZALCOATL": 8,
+  "CENTRO DE SALUD AMPLIACION LAGUNILLA": 9,
+  "CENTRO DE SALUD ANTONIO BARONA": 10,
+  "CENTRO DE SALUD APANZINGO": 11,
+  "CENTRO DE SALUD ATLACHOLOAYA": 12,
+  "CENTRO DE SALUD BENITO JUÁREZ": 13,
+  "CENTRO DE SALUD BUENA VISTA DEL MONTE": 14,
+  "CENTRO DE SALUD CALERA CHICA": 15,
+  "CENTRO DE SALUD CHAMILPA": 16,
+  "CENTRO DE SALUD CHAVARRIA": 17,
+  "CENTRO DE SALUD CHICONCUAC": 18,
+  "CENTRO DE SALUD CHIPITLÁN": 19,
+  "CENTRO DE SALUD COAJOMULCO": 20,
+  "CENTRO DE SALUD COATETELCO": 21,
+  "CENTRO DE SALUD COATLÁN DEL RÍO": 22,
+  "CENTRO DE SALUD COCOYOTLA": 23,
+  "CENTRO DE SALUD COLONIA INDEPENDENCIA": 24,
+  "CENTRO DE SALUD COLONIA MORELOS": 25,
+  "CENTRO DE SALUD CONTLALCO": 26,
+  "CENTRO DE SALUD CUAUCHICHINOLA": 27,
+  "CENTRO DE SALUD CUAUTLITA": 28,
+  "CENTRO DE SALUD CUENTEPEC": 29,
+  "CENTRO DE SALUD CUERNAVACA": 30,
+  "CENTRO DE SALUD DIEZ DE ABRIL": 31,
+  "CENTRO DE SALUD EL CAPIRI": 32,
+  "CENTRO DE SALUD EMILIANO ZAPATA": 33,
+  "CENTRO DE SALUD HUITZILAC": 34,
+  "CENTRO DE SALUD HUIZACHERA": 35,
+  "CENTRO DE SALUD JARDÍN JUAREZ": 36,
+  "CENTRO DE SALUD JIUTEPEC": 37,
+  "CENTRO DE SALUD JOSÉ G. PARRES": 38,
+  "CENTRO DE SALUD JOSÉ LÓPEZ PORTILLO": 39,
+  "CENTRO DE SALUD LA NOPALERA": 40,
+  "CENTRO DE SALUD LA TOMA": 41,
+  "CENTRO DE SALUD LAGUNILLA DEL SALTO": 42,
+  "CENTRO DE SALUD LÁZARO CÁRDENAS": 43,
+  "CENTRO DE SALUD LOMAS DE CORTES": 44,
+  "CENTRO DE SALUD LOMAS DE JIUTEPEC": 45,
+  "CENTRO DE SALUD LOMAS DEL CARRIL": 46,
+  "CENTRO DE SALUD MAZATEPEC": 47,
+  "CENTRO DE SALUD MIACATLÁN": 48,
+  "CENTRO DE SALUD MICHAPA": 49,
+  "CENTRO DE SALUD OCOTEPEC": 50,
+  "CENTRO DE SALUD OTILIO MONTAÑO": 51,
+  "CENTRO DE SALUD PALPAN": 52,
+  "CENTRO DE SALUD PLAN DE AYALA": 53,
+  "CENTRO DE SALUD PROGRESO": 54,
+  "CENTRO DE SALUD PUEBLO VIEJO": 55,
+  "CENTRO DE SALUD REVOLUCIÓN": 56,
+  "CENTRO DE SALUD SAN ANDRES DE LA CAL": 57,
+  "CENTRO DE SALUD SAN CRISTOBAL": 58,
+  "CENTRO DE SALUD SAN JUAN TLACOTENCO": 59,
+  "CENTRO DE SALUD SAN MIGUEL ACAPANTZINGO": 60,
+  "CENTRO DE SALUD SANTA CATARINA": 61,
+  "CENTRO DE SALUD SANTA MARÍA AHUACATITLÁN": 62,
+  "CENTRO DE SALUD SANTIAGO TEPETLAPA": 63,
+  "CENTRO DE SALUD SANTO DOMINGO": 64,
+  "CENTRO DE SALUD SATÉLITE": 65,
+  "CENTRO DE SALUD TEJALPA": 66,
+  "CENTRO DE SALUD TEMIXCO": 67,
+  "CENTRO DE SALUD TEPETZINGO": 68,
+  "CENTRO DE SALUD TETECALA": 69,
+  "CENTRO DE SALUD TETECALITA": 70,
+  "CENTRO DE SALUD TETLAMA": 71,
+  "CENTRO DE SALUD TEZOYUCA": 72,
+  "CENTRO DE SALUD TILANCINGO": 73,
+  "CENTRO DE SALUD TLAHUAPAN": 74,
+  "CENTRO DE SALUD TLALTENANGO": 75,
+  "CENTRO DE SALUD TRES DE MAYO": 76,
+  "CENTRO DE SALUD TRES MARÍAS": 77,
+  "CENTRO DE SALUD U.H.J.MA, MORELOS Y PAVON": 78,
+  "CENTRO DE SALUD UNIDAD MORELOS 2A. SECCIÓN": 79,
+  "CENTRO DE SALUD VILLA DE LA FLORES": 80,
+  "CENTRO DE SALUD XOCHITEPEC": 81,
+  "CENTRO SyGUE CUERNAVACA": 82,
+  "CENTRO SyGUE TEMIXCO": 83,
+  "CNTRO DE SALUD CUAUHTEMOC": 84,
+  "SERVICIOS INTEGRALES PARA LA PREVENCIÓN Y ATENCIÓN DE LA DISCAPACIDAD POR DEFECTOS AL NACIMIENTO, TEMIXCO": 85,
+  "UEDO": 86,
+  "UNEME CENTRO INTEGRAL DE SALUD MENTAL, EMILIANO ZAPATA": 87,
+  "UNEME ENFERMEDADES CRÓNICOS, CUERNAVACA": 88,
+  "CAPASITS CUERNAVACA": 89,
+  "CENTRO COMUNITARIO DE SALUD MENTAL Y ADICCIONES CUERNAVACA": 90,
+  "CENTRO COMUNITARIO DE SALUD MENTAL Y ADICCIONES TEMIXCO": 91,
+  "CENTRO COMUNITARIO DE SALUD MENTAL Y ADICCIONES JIUTEPEC": 92,
+  "CENTRO COMUNITARIO DE SALUD MENTAL Y ADICCIONES XOCHITEPEC": 93,
+  "CENTRO DE ATENCIÓN INTEGRAL PARA LA SALUD DEL ADOLESCENTE, XOCHITEPEC": 94,
+  "CENTRO DE ATENCIÓN PARA LA SALUD DE LA MUJER, CUERNAVACA": 95,
+  "CENTRO DE SALUD DE TEPOZTLAN": 96,
+  "CENTRO DE SALUD COL. EMILIANO ZAPATA": 97,
+};
+
+// Filas ordenadas según la estructura de los formularios del cliente.
+// ESTO DEBE MANTENERSE SINCRONIZADO CON EL OBJETO `estructura` EN Index.html
+// SE HA ELIMINADO LA SECCIÓN DE TOTALES (FILAS 70-80)
+const ORDERED_FILAS_ESTRUCTURA = [
+    ...Array.from({length: 9}, (_, i) => i + 6),   // Curaciones (filas 6-14)
+    ...Array.from({length: 7}, (_, i) => i + 15),  // Estomatología (filas 15-21)
+    ...Array.from({length: 6}, (_, i) => i + 22),  // CEYE (filas 22-27)
+    ...Array.from({length: 25}, (_, i) => i + 28), // Atención Preventiva (filas 28-52)
+    ...Array.from({length: 5}, (_, i) => i + 53), // Atención Materno infantil (filas 53-57)
+    ...Array.from({length: 5}, (_, i) => i + 58),  // Clínica de heridas (filas 58-62)
+    ...Array.from({length: 6}, (_, i) => i + 63),  // Atención Humana (filas 63-68)
+];
+
+
+function getHeaderData() {
+  const hoja = SpreadsheetApp.openById(CentrosProductividad).getSheetByName("mes cursando");
+  const datoA2 = hoja.getRange("A2").getValue();
+  const datoA3 = hoja.getRange("A3").getValue();
+  return { a2: datoA2, a3: datoA3 };
+}
+
+function getEnfermeras() {
+  try {
+    const ssProductividad = SpreadsheetApp.openById(ProductividadEnfermeras);
+    const fecha = new Date();
+    const nombreHojaMes = fecha.toLocaleDateString('es-ES', { month: 'long' }).toUpperCase();
+    const hojaEnfermeras = ssProductividad.getSheetByName(nombreHojaMes);
+
+    if (!hojaEnfermeras) {
+      throw new Error(`La hoja del mes '${nombreHojaMes}' no se encontró en el archivo ProductividadEnfermeras.`);
+    }
+    const lastRow = hojaEnfermeras.getLastRow();
+    if (lastRow < 2) {
+        return [];
+    }
+    const range = hojaEnfermeras.getRange("B2:B" + lastRow);
+    const names = range.getValues().flat().filter(name => name && name.toString().trim() !== "");
+    return names;
+  } catch (e) {
+    Logger.log("Error en getEnfermeras: " + e.message + " Stack: " + e.stack);
+    return { error: "Error al obtener lista de enfermeras: " + e.message };
+  }
+}
+
+
+function guardarDatos(centro, enfermeraSeleccionada, datosFormulario) {
+  try {
+    const spreadsheetCentros = SpreadsheetApp.openById(CentrosProductividad); // Objeto para CentrosProductividad
+
+    // --- 1. Guardar/Sumar en "CentrosProductividad" ---
+    const hojaCentros = spreadsheetCentros.getSheetByName("mes cursando");
+    const colIndexCentro = CENTRO_COL_MAP[centro];
+    if (!colIndexCentro) {
+      throw new Error("Centro de salud '" + centro + "' no encontrado o no mapeado para guardar.");
+    }
+
+    datosFormulario.forEach(({fila, valor}) => {
+      // Solo procesar filas que están en ORDERED_FILAS_ESTRUCTURA (excluye Totales implícitamente)
+      if (ORDERED_FILAS_ESTRUCTURA.includes(parseInt(fila))) {
+        const cell = hojaCentros.getRange(fila, colIndexCentro);
+        const valorActual = parseFloat(cell.getValue()) || 0;
+        const valorNuevo = parseFloat(valor) || 0;
+        cell.setValue(valorActual + valorNuevo);
+      }
+    });
+    Logger.log(`Datos sumados para ${centro} en 'mes cursando'.`);
+
+    // --- 2. Guardar en "ProductividadEnfermeras" ---
+    const ssProductividad = SpreadsheetApp.openById(ProductividadEnfermeras);
+    const fecha = new Date();
+    const nombreHojaMes = fecha.toLocaleDateString('es-ES', { month: 'long' }).toUpperCase();
+    const hojaEnfermeras = ssProductividad.getSheetByName(nombreHojaMes);
+
+    if (!hojaEnfermeras) {
+      throw new Error(`Hoja del mes '${nombreHojaMes}' no encontrada en ProductividadEnfermeras.`);
+    }
+
+    const nombresEnfermerasRango = hojaEnfermeras.getRange(1, 2, hojaEnfermeras.getLastRow(), 1);
+    const nombresEnfermeras = nombresEnfermerasRango.getValues().flat();
+    let filaEnfermera = -1;
+    for (let i = 0; i < nombresEnfermeras.length; i++) {
+      if (nombresEnfermeras[i] && nombresEnfermeras[i].toString().trim() === enfermeraSeleccionada) {
+        filaEnfermera = i + nombresEnfermerasRango.getRow();
+        break;
+      }
+    }
+
+    if (filaEnfermera === -1) {
+      throw new Error(`Enfermera '${enfermeraSeleccionada}' no encontrada en la columna B de la hoja '${nombreHojaMes}'.`);
+    }
+
+    const valoresParaProductividad = ORDERED_FILAS_ESTRUCTURA.map(filaNum => {
+        const datoEncontrado = datosFormulario.find(d => d.fila === filaNum);
+        return parseFloat(datoEncontrado ? datoEncontrado.valor : "0") || 0;
+    });
+
+    if (valoresParaProductividad.length > 0) {
+        hojaEnfermeras.getRange(filaEnfermera, 3, 1, valoresParaProductividad.length).setValues([valoresParaProductividad]);
+        Logger.log(`Datos guardados para ${enfermeraSeleccionada} en hoja '${nombreHojaMes}', fila ${filaEnfermera}.`);
+    }
+
+    // --- 3. Registrar en "Historico registros" ---
+    try {
+        const historicoSheet = spreadsheetCentros.getSheetByName("Historico registros");
+        if (historicoSheet) {
+            const timestamp = new Date();
+            // Asegurarse de que la zona horaria es la correcta para México Centro
+            const formattedTimestamp = Utilities.formatDate(timestamp, "GMT-6", "dd/MM/yyyy HH:mm:ss"); // Ajustar GMT si es necesario
+            historicoSheet.appendRow([formattedTimestamp, centro, enfermeraSeleccionada]);
+            Logger.log(`Registro añadido a 'Historico registros': ${formattedTimestamp}, ${centro}, ${enfermeraSeleccionada}`);
+        } else {
+            Logger.log("ADVERTENCIA: La hoja 'Historico registros' no fue encontrada en el archivo 'CentrosProductividad'. No se pudo registrar la operación.");
+        }
+    } catch (histError) {
+        Logger.log("Error al intentar registrar en 'Historico registros': " + histError.message + " Stack: " + histError.stack);
+    }
+
+
+    return { message: "Cambios guardados y sumados correctamente. Se intentó añadir registro histórico." };
+
+  } catch (e) {
+    Logger.log("Error en guardarDatos: " + e.message + " Stack: " + e.stack);
+    throw new Error("Error del servidor al guardar: " + e.message);
+  }
+}
+
+// --- Funciones para Gestión Mensual Automática ---
+
+function columnToLetter(column) {
+  let temp, letter = '';
+  while (column > 0) {
+    temp = (column - 1) % 26;
+    letter = String.fromCharCode(temp + 65) + letter;
+    column = (column - temp - 1) / 26;
+  }
+  return letter;
+}
+
+function gestionarHojaMensual() {
+  const spreadsheetId = CentrosProductividad;
+  const ss = SpreadsheetApp.openById(spreadsheetId);
+  const hojaCursandoNombre = "mes cursando";
+  const hojaCursando = ss.getSheetByName(hojaCursandoNombre);
+
+  if (!hojaCursando) {
+    Logger.error(`La hoja '${hojaCursandoNombre}' no fue encontrada. Proceso abortado.`);
+    return;
+  }
+
+  const hoy = new Date();
+  const primerDiaMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  const ultimoDiaMesPasado = new Date(primerDiaMesActual.getTime() - (24 * 60 * 60 * 1000));
+
+  const mesPasadoNombre = ultimoDiaMesPasado.toLocaleDateString('es-ES', { month: 'long' });
+  const anoMesPasado = ultimoDiaMesPasado.getFullYear();
+
+  const nombreHojaArchivada = `enfermería (${mesPasadoNombre} ${anoMesPasado})`;
+  if (ss.getSheetByName(nombreHojaArchivada)) {
+    Logger.log(`La hoja '${nombreHojaArchivada}' ya existe. Se omitirá la duplicación.`);
+  } else {
+    const hojaArchivada = hojaCursando.copyTo(ss);
+    hojaArchivada.setName(nombreHojaArchivada);
+    Logger.log(`Hoja '${hojaCursandoNombre}' (datos de ${mesPasadoNombre} ${anoMesPasado}) duplicada y renombrada a '${nombreHojaArchivada}'.`);
+  }
+
+  const mesActualNombre = hoy.toLocaleDateString('es-ES', { month: 'long' });
+  const anoActual = hoy.getFullYear();
+  hojaCursando.getRange("A3").setValue(`Periodo: (${mesActualNombre} ${anoActual})`);
+  Logger.log(`Celda A3 en '${hojaCursandoNombre}' actualizada a 'Periodo: (${mesActualNombre} ${anoActual})'.`);
+
+  let maxColMapped = 0;
+  for (const centro in CENTRO_COL_MAP) {
+    if (CENTRO_COL_MAP[centro] > maxColMapped) {
+      maxColMapped = CENTRO_COL_MAP[centro];
+    }
+  }
+
+  if (maxColMapped >= 3) {
+    const primeraFilaDatos = 6;
+    const ultimaFilaDatos = 80; // Esta es la última fila física que se limpia, aunque los datos de Totales (70-80) ya no se usen.
+    const numFilas = ultimaFilaDatos - primeraFilaDatos + 1;
+    const primeraColDatos = 3;
+    const numColsALimpiar = maxColMapped - primeraColDatos + 1;
+
+    const rangoParaLimpiar = hojaCursando.getRange(primeraFilaDatos, primeraColDatos, numFilas, numColsALimpiar);
+    rangoParaLimpiar.clearContent();
+    Logger.log(`Contenido de C${primeraFilaDatos}:${columnToLetter(maxColMapped)}${ultimaFilaDatos} en '${hojaCursandoNombre}' eliminado para el nuevo mes.`);
+  } else {
+    Logger.log(`No se limpiaron columnas en '${hojaCursandoNombre}' ya que la columna máxima mapeada (${maxColMapped}) es menor que C.`);
+  }
+  SpreadsheetApp.flush();
+}
+
+function crearTriggerMensual() {
+  const triggers = ScriptApp.getProjectTriggers();
+  for (const trigger of triggers) {
+    if (trigger.getHandlerFunction() === "gestionarHojaMensual") {
+      ScriptApp.deleteTrigger(trigger);
+      Logger.log("Trigger mensual existente para 'gestionarHojaMensual' eliminado.");
+    }
+  }
+  ScriptApp.newTrigger("gestionarHojaMensual")
+    .timeBased()
+    .onMonthDay(1)
+    .atHour(1)
+    .create();
+  Logger.log("Nuevo trigger mensual creado para 'gestionarHojaMensual' (día 1 del mes, ~1:00 AM).");
+  SpreadsheetApp.getUi().alert("¡Trigger mensual creado! La función 'gestionarHojaMensual' se ejecutará el día 1 de cada mes alrededor de la 1:00 AM.");
+}
+
+// NUEVA FUNCIÓN para obtener datos de productividad de una enfermera
+function getNurseProductivityData(nurseName) {
+  try {
+    if (!nurseName || typeof nurseName !== 'string' || nurseName.trim() === "") {
+      return { error: "Nombre de enfermera/o no válido." };
+    }
+
+    const ssProductividad = SpreadsheetApp.openById(ProductividadEnfermeras); /* [cite: 15] */
+    const fecha = new Date(); /* [cite: 15] */
+    const nombreHojaMes = fecha.toLocaleDateString('es-ES', { month: 'long' }).toUpperCase(); /* [cite: 16] */
+    const hojaEnfermeras = ssProductividad.getSheetByName(nombreHojaMes); /* [cite: 16] */
+
+    if (!hojaEnfermeras) { /* [cite: 17] */
+      return { error: `La hoja del mes '${nombreHojaMes}' no se encontró en el archivo ProductividadEnfermeras.` }; /* [cite: 17] */
+    }
+
+    const nombresEnfermerasRango = hojaEnfermeras.getRange(1, 2, hojaEnfermeras.getLastRow(), 1); /* [cite: 29] */
+    const nombresEnfermeras = nombresEnfermerasRango.getValues().flat(); /* [cite: 29] */
+    let filaEnfermera = -1;
+    for (let i = 0; i < nombresEnfermeras.length; i++) { /* [cite: 30] */
+      if (nombresEnfermeras[i] && nombresEnfermeras[i].toString().trim() === nurseName.trim()) { /* [cite: 30] */
+        filaEnfermera = i + nombresEnfermerasRango.getRow(); /* [cite: 30] */
+        break; /* [cite: 31] */
+      }
+    }
+
+    if (filaEnfermera === -1) {
+      return { error: `Enfermera/o '${nurseName}' no encontrada en la hoja '${nombreHojaMes}'.` }; /* [cite: 31] */
+    }
+
+    const numActivities = ORDERED_FILAS_ESTRUCTURA.length;
+    if (numActivities === 0) {
+       return { error: "No hay estructura de actividades definida (ORDERED_FILAS_ESTRUCTURA está vacía)." };
+    }
+    
+    const lastDataColumnIndex = 2 + numActivities; // Col B is 2, so C is 3. Col C + numActivities - 1.
+    if (hojaEnfermeras.getMaxColumns() < lastDataColumnIndex) {
+        // This means the sheet might not have all columns yet, or ORDERED_FILAS_ESTRUCTURA is too large
+        // We'll try to read what's available up to numActivities or max columns in sheet.
+        Logger.log(`Advertencia: La hoja '${nombreHojaMes}' tiene ${hojaEnfermeras.getMaxColumns()} columnas, pero se esperaban hasta ${lastDataColumnIndex} basado en ORDERED_FILAS_ESTRUCTURA.`);
+    }
+    
+    const actualColsToRead = Math.min(numActivities, hojaEnfermeras.getMaxColumns() - 2);
+    if (actualColsToRead <=0) {
+        return { data: [], message: "No hay columnas de actividades para leer o la hoja está vacía." };
+    }
+
+
+    // Obtener los títulos de las actividades desde la fila 1, columna C en adelante
+    const activityTitles = hojaEnfermeras.getRange(1, 3, 1, actualColsToRead).getDisplayValues()[0];
+
+    // Obtener los datos de productividad de la enfermera/o
+    const productivityValues = hojaEnfermeras.getRange(filaEnfermera, 3, 1, actualColsToRead).getDisplayValues()[0];
+
+    const resultData = [];
+    for (let i = 0; i < actualColsToRead; i++) {
+      resultData.push({
+        actividad: activityTitles[i] || `Actividad ${i+1} (sin título)`,
+        valor: productivityValues[i] || "0" // Mostrar "0" si está vacío
+      });
+    }
+    
+    if (actualColsToRead < numActivities) {
+        Logger.log(`Se leyeron ${actualColsToRead} columnas de actividades, pero se esperaban ${numActivities}. Las restantes no pudieron ser leídas.`);
+    }
+
+    return { data: resultData };
+
+  } catch (e) {
+    Logger.log("Error en getNurseProductivityData: " + e.message + " Stack: " + e.stack);
+    return { error: "Error del servidor al obtener datos de productividad: " + e.message };
+  }
+}
