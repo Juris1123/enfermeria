@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Visualización de Centros de Salud</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/es.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    :root {
+      --ssm-dark-green: #005826;
+      --ssm-vibrant-green: #008037;
+      --ssm-accent-red: #D42C3A;
+      --ssm-light-gray: #f0f0f0;
+      --ssm-text-on-dark: #FFFFFF;
+      --ssm-text-on-light: #212529;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #F8F9FA;
+      color: var(--ssm-text-on-light);
+    }
+
+    .navbar-custom {
+      background-color: var(--ssm-text-on-dark);
+      border-bottom: 1px solid #e0e0e0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .navbar-brand img {
+      max-height: 40px;
+      width: auto;
+    }
+    /* Ajuste para el contenedor del logo y el espaciador para que tengan la misma altura y alineación */
+    .navbar-brand, .navbar-spacer {
+        display: flex;
+        align-items: center;
+        min-height: 40px; /* Altura mínima igual a la imagen del logo */
+    }
+
+
+    .navbar-title {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: #333;
+      margin: 0;
+      white-space: normal; /* Allow text to wrap */
+      text-align: right; /* Default alignment for larger screens */
+    }
+
+    .navbar-title .bi {
+      color: var(--ssm-vibrant-green);
+      font-size: 1.8rem;
+    }
+
+    .navbar-subtitle {
+      font-size: 0.9rem;
+      color: #6c757d;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+     /* Contenedor principal de la primera fila del navbar */
+    .navbar-main-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    /* Media query for mobile view */
+    @media (max-width: 767.98px) {
+        .navbar-main-row {
+            flex-direction: column; /* Stack items vertically */
+            align-items: flex-start; /* Align logo and title to the left */
+        }
+        .navbar-brand {
+            margin-bottom: 0.5rem; /* Add some space below the logo */
+        }
+        .navbar-title {
+            text-align: left; /* Align the title text to the left */
+            width: 100%; /* Ensure the title takes full width */
+            font-size: 1.1rem; /* Adjust font size for better mobile display */
+        }
+    }
+
+
+    .main-container {
+      padding-top: 3rem;
+      padding-bottom: 2rem;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: var(--ssm-text-on-light);
+      margin-bottom: .5rem;
+    }
+
+    .form-select,
+    .form-control {
+      border: 1px solid #ced4da;
+      border-radius: .5rem;
+      padding: .75rem 1rem;
+      font-size: 1rem;
+      color: #495057;
+      transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    .form-select:focus,
+    .form-control:focus {
+      border-color: var(--ssm-vibrant-green);
+      box-shadow: 0 0 0 .25rem rgba(0, 128, 55, .3);
+      outline: 0;
+    }
+
+    .card-custom {
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      margin-bottom: 2rem;
+    }
+
+    .card-custom:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header-custom {
+      background-color: var(--ssm-dark-green);
+      color: var(--ssm-text-on-dark);
+      font-weight: 600;
+      font-size: 1.4rem;
+      border-top-left-radius: 1rem;
+      border-top-right-radius: 1rem;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .card-header-custom .bi {
+      margin-right: 1rem;
+      font-size: 1.8rem;
+    }
+
+    .card-body-custom {
+      padding: 2rem;
+    }
+
+    .btn-action-wrapper {
+        display: flex;
+        gap: 0.5rem;
+        width: 100%;
+        align-items: stretch;
+    }
+
+    .btn-action-wrapper .btn {
+        flex-grow: 1;
+        padding: 0.65rem 0.5rem;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+        line-height: 1.4;
+    }
+    .btn-action-wrapper .btn .bi {
+        margin-right: .5rem;
+        font-size: 1.1rem;
+    }
+
+    .btn-save-integrated,
+    .btn-ingresar-productividad,
+    .btn-consultar-productividad {
+      color: var(--ssm-text-on-dark);
+      border: none;
+      border-radius: .5rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+    }
+    .btn-save-integrated {
+      background-color: var(--ssm-dark-green);
+      padding: .85rem 2.5rem;
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
+     .btn-save-integrated .bi {
+        margin-right: .75rem;
+        font-size: 1.4rem;
+    }
+
+    .btn-ingresar-productividad {
+      background-color: var(--ssm-vibrant-green);
+    }
+    .btn-consultar-productividad {
+      background-color: var(--ssm-accent-red);
+    }
+
+    .btn-save-integrated:hover:not(:disabled),
+    .btn-ingresar-productividad:hover:not(:disabled),
+    .btn-consultar-productividad:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-save-integrated:hover:not(:disabled) {
+      background-color: #00401a;
+    }
+    .btn-ingresar-productividad:hover:not(:disabled) {
+      background-color: #00662c;
+    }
+    .btn-consultar-productividad:hover:not(:disabled) {
+      background-color: #a7222e;
+    }
+
+    .btn-save-integrated:disabled,
+    .btn-ingresar-productividad:disabled,
+    .btn-consultar-productividad:disabled {
+      background-color: #ced4da;
+      color: #6c757d;
+      cursor: not-allowed;
+      opacity: 0.8;
+      box-shadow: none;
+    }
+
+    .footer-custom {
+      background-color: var(--ssm-text-on-dark);
+      border-top: 1px solid #e9ecef;
+      color: #6c757d;
+      padding: 1.5rem 0;
+    }
+
+    .select2-container .select2-selection--single {
+      height: calc(1.5em + 1.5rem + 2px);
+      border: 1px solid #ced4da;
+      border-radius: .5rem;
+      padding: .375rem .75rem;
+      display: flex;
+      align-items: center;
+      line-height: 1.5;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+      color: #495057;
+      padding-left: .5rem;
+      padding-right: .5rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+      height: 100%;
+      right: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--single {
+      border-color: var(--ssm-vibrant-green);
+      box-shadow: 0 0 0 .25rem rgba(0, 128, 55, .3);
+    }
+
+    .select2-dropdown {
+      border: 1px solid #ced4da;
+      border-radius: .5rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      margin-top: .25rem;
+    }
+
+    .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+      background-color: var(--ssm-vibrant-green) !important;
+      color: var(--ssm-text-on-dark) !important;
+    }
+
+    .select2-container--default .select2-results__option--selected {
+      background-color: #e9ecef;
+      color: #495057;
+    }
+
+    .select-container {
+      margin-bottom: 1.5rem;
+    }
+    #modalProductividadDataContainer {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+  </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+  <nav class="navbar navbar-custom">
+    <div class="container-lg">
+        <div class="navbar-main-row">
+            <a class="navbar-brand" href="#">
+                <img src="https://i.ibb.co/S5NCX5v/ssm-logo-OK-VEDA.png" alt="SALUD-Logo" loading="lazy">
+            </a>
+            <h1 class="navbar-title"> <i class="bi bi-hospital me-2"></i> Producitividad Enfermería </h1>
+        </div>
+        <div class="row w-100">
+            <div class="col-12 text-end">
+                <p class="navbar-subtitle m-0" id="datoA2Display"></p>
+                <p class="navbar-subtitle m-0" id="datoA3Display"></p>
+            </div>
+        </div>
+    </div>
+  </nav>
+
+  <main class="container main-container flex-grow-1">
+    <div class="row justify-content-center select-container align-items-end">
+      <div class="col-lg-4 col-md-6 mb-3">
+        <label for="centroSelect" class="form-label">Selecciona un centro de salud:</label>
+        <select id="centroSelect" class="form-select">
+            <option value="">-- Escriba o seleccione un centro --</option>
+            <option value="CENTRO DE SALUD ACATLIPA">CENTRO DE SALUD ACATLIPA</option>
+            <option value="CENTRO DE SALUD AHUATEPEC">CENTRO DE SALUD AHUATEPEC</option>
+            <option value="CENTRO DE SALUD ALPUYECA">CENTRO DE SALUD ALPUYECA</option>
+            <option value="CENTRO DE SALUD ALTA PALMIRA">CENTRO DE SALUD ALTA PALMIRA</option>
+            <option value="CENTRO DE SALUD ALTA VISTA">CENTRO DE SALUD ALTA VISTA</option>
+            <option value="CENTRO DE SALUD AMATLÁN DE QUETZALCOATL">CENTRO DE SALUD AMATLÁN DE QUETZALCOATL</option>
+            <option value="CENTRO DE SALUD AMPLIACION LAGUNILLA">CENTRO DE SALUD AMPLIACION LAGUNILLA</option>
+            <option value="CENTRO DE SALUD ANTONIO BARONA">CENTRO DE SALUD ANTONIO BARONA</option>
+            <option value="CENTRO DE SALUD APANZINGO">CENTRO DE SALUD APANZINGO</option>
+            <option value="CENTRO DE SALUD ATLACHOLOAYA">CENTRO DE SALUD ATLACHOLOAYA</option>
+            <option value="CENTRO DE SALUD BENITO JUÁREZ">CENTRO DE SALUD BENITO JUÁREZ</option>
+            <option value="CENTRO DE SALUD BUENA VISTA DEL MONTE">CENTRO DE SALUD BUENA VISTA DEL MONTE</option>
+            <option value="CENTRO DE SALUD CALERA CHICA">CENTRO DE SALUD CALERA CHICA</option>
+            <option value="CENTRO DE SALUD CHAMILPA">CENTRO DE SALUD CHAMILPA</option>
+            <option value="CENTRO DE SALUD CHAVARRIA">CENTRO DE SALUD CHAVARRIA</option>
+            <option value="CENTRO DE SALUD CHICONCUAC">CENTRO DE SALUD CHICONCUAC</option>
+            <option value="CENTRO DE SALUD CHIPITLÁN">CENTRO DE SALUD CHIPITLÁN</option>
+            <option value="CENTRO DE SALUD COAJOMULCO">CENTRO DE SALUD COAJOMULCO</option>
+            <option value="CENTRO DE SALUD COATETELCO">CENTRO DE SALUD COATETELCO</option>
+            <option value="CENTRO DE SALUD COATLÁN DEL RÍO">CENTRO DE SALUD COATLÁN DEL RÍO</option>
+            <option value="CENTRO DE SALUD COCOYOTLA">CENTRO DE SALUD COCOYOTLA</option>
+            <option value="CENTRO DE SALUD COLONIA INDEPENDENCIA">CENTRO DE SALUD COLONIA INDEPENDENCIA</option>
+            <option value="CENTRO DE SALUD COLONIA MORELOS">CENTRO DE SALUD COLONIA MORELOS</option>
+            <option value="CENTRO DE SALUD CONTLALCO">CENTRO DE SALUD CONTLALCO</option>
+            <option value="CENTRO DE SALUD CUAUCHICHINOLA">CENTRO DE SALUD CUAUCHICHINOLA</option>
+            <option value="CENTRO DE SALUD CUAUTLITA">CENTRO DE SALUD CUAUTLITA</option>
+            <option value="CENTRO DE SALUD CUENTEPEC">CENTRO DE SALUD CUENTEPEC</option>
+            <option value="CENTRO DE SALUD CUERNAVACA">CENTRO DE SALUD CUERNAVACA</option>
+            <option value="CENTRO DE SALUD DIEZ DE ABRIL">CENTRO DE SALUD DIEZ DE ABRIL</option>
+            <option value="CENTRO DE SALUD EL CAPIRI">CENTRO DE SALUD EL CAPIRI</option>
+            <option value="CENTRO DE SALUD EMILIANO ZAPATA">CENTRO DE SALUD EMILIANO ZAPATA</option>
+            <option value="CENTRO DE SALUD HUITZILAC">CENTRO DE SALUD HUITZILAC</option>
+            <option value="CENTRO DE SALUD HUIZACHERA">CENTRO DE SALUD HUIZACHERA</option>
+            <option value="CENTRO DE SALUD JARDÍN JUAREZ">CENTRO DE SALUD JARDÍN JUAREZ</option>
+            <option value="CENTRO DE SALUD JIUTEPEC">CENTRO DE SALUD JIUTEPEC</option>
+            <option value="CENTRO DE SALUD JOSÉ G. PARRES">CENTRO DE SALUD JOSÉ G. PARRES</option>
+            <option value="CENTRO DE SALUD JOSÉ LÓPEZ PORTILLO">CENTRO DE SALUD JOSÉ LÓPEZ PORTILLO</option>
+            <option value="CENTRO DE SALUD LA NOPALERA">CENTRO DE SALUD LA NOPALERA</option>
+            <option value="CENTRO DE SALUD LA TOMA">CENTRO DE SALUD LA TOMA</option>
+            <option value="CENTRO DE SALUD LAGUNILLA DEL SALTO">CENTRO DE SALUD LAGUNILLA DEL SALTO</option>
+            <option value="CENTRO DE SALUD LÁZARO CÁRDENAS">CENTRO DE SALUD LÁZARO CÁRDENAS</option>
+            <option value="CENTRO DE SALUD LOMAS DE CORTES">CENTRO DE SALUD LOMAS DE CORTES</option>
+            <option value="CENTRO DE SALUD LOMAS DE JIUTEPEC">CENTRO DE SALUD LOMAS DE JIUTEPEC</option>
+            <option value="CENTRO DE SALUD LOMAS DEL CARRIL">CENTRO DE SALUD LOMAS DEL CARRIL</option>
+            <option value="CENTRO DE SALUD MAZATEPEC">CENTRO DE SALUD MAZATEPEC</option>
+            <option value="CENTRO DE SALUD MIACATLÁN">CENTRO DE SALUD MIACATLÁN</option>
+            <option value="CENTRO DE SALUD MICHAPA">CENTRO DE SALUD MICHAPA</option>
+            <option value="CENTRO DE SALUD OCOTEPEC">CENTRO DE SALUD OCOTEPEC</option>
+            <option value="CENTRO DE SALUD OTILIO MONTAÑO">CENTRO DE SALUD OTILIO MONTAÑO</option>
+            <option value="CENTRO DE SALUD PALPAN">CENTRO DE SALUD PALPAN</option>
+            <option value="CENTRO DE SALUD PLAN DE AYALA">CENTRO DE SALUD PLAN DE AYALA</option>
+            <option value="CENTRO DE SALUD PROGRESO">CENTRO DE SALUD PROGRESO</option>
+            <option value="CENTRO DE SALUD PUEBLO VIEJO">CENTRO DE SALUD PUEBLO VIEJO</option>
+            <option value="CENTRO DE SALUD REVOLUCIÓN">CENTRO DE SALUD REVOLUCIÓN</option>
+            <option value="CENTRO DE SALUD SAN ANDRES DE LA CAL">CENTRO DE SALUD SAN ANDRES DE LA CAL</option>
+            <option value="CENTRO DE SALUD SAN CRISTOBAL">CENTRO DE SALUD SAN CRISTOBAL</option>
+            <option value="CENTRO DE SALUD SAN JUAN TLACOTENCO">CENTRO DE SALUD SAN JUAN TLACOTENCO</option>
+            <option value="CENTRO DE SALUD SAN MIGUEL ACAPANTZINGO">CENTRO DE SALUD SAN MIGUEL ACAPANTZINGO</option>
+            <option value="CENTRO DE SALUD SANTA CATARINA">CENTRO DE SALUD SANTA CATARINA</option>
+            <option value="CENTRO DE SALUD SANTA MARÍA AHUACATITLÁN">CENTRO DE SALUD SANTA MARÍA AHUACATITLÁN</option>
+            <option value="CENTRO DE SALUD SANTIAGO TEPETLAPA">CENTRO DE SALUD SANTIAGO TEPETLAPA</option>
+            <option value="CENTRO DE SALUD SANTO DOMINGO">CENTRO DE SALUD SANTO DOMINGO</option>
+            <option value="CENTRO DE SALUD SATÉLITE">CENTRO DE SALUD SATÉLITE</option>
+            <option value="CENTRO DE SALUD TEJALPA">CENTRO DE SALUD TEJALPA</option>
+            <option value="CENTRO DE SALUD TEMIXCO">CENTRO DE SALUD TEMIXCO</option>
+            <option value="CENTRO DE SALUD TEPETZINGO">CENTRO DE SALUD TEPETZINGO</option>
+            <option value="CENTRO DE SALUD TETECALA">CENTRO DE SALUD TETECALA</option>
+            <option value="CENTRO DE SALUD TETECALITA">CENTRO DE SALUD TETECALITA</option>
+            <option value="CENTRO DE SALUD TETLAMA">CENTRO DE SALUD TETLAMA</option>
+            <option value="CENTRO DE SALUD TEZOYUCA">CENTRO DE SALUD TEZOYUCA</option>
+            <option value="CENTRO DE SALUD TILANCINGO">CENTRO DE SALUD TILANCINGO</option>
+            <option value="CENTRO DE SALUD TLAHUAPAN">CENTRO DE SALUD TLAHUAPAN</option>
+            <option value="CENTRO DE SALUD TLALTENANGO">CENTRO DE SALUD TLALTENANGO</option>
+            <option value="CENTRO DE SALUD TRES DE MAYO">CENTRO DE SALUD TRES DE MAYO</option>
+            <option value="CENTRO DE SALUD TRES MARÍAS">CENTRO DE SALUD TRES MARÍAS</option>
+            <option value="CENTRO DE SALUD U.H.J.MA, MORELOS Y PAVON">CENTRO DE SALUD U.H.J.MA, MORELOS Y PAVON</option>
+            <option value="CENTRO DE SALUD UNIDAD MORELOS 2A. SECCIÓN">CENTRO DE SALUD UNIDAD MORELOS 2A. SECCIÓN</option>
+            <option value="CENTRO DE SALUD VILLA DE LA FLORES">CENTRO DE SALUD VILLA DE LA FLORES</option>
+            <option value="CENTRO DE SALUD XOCHITEPEC">CENTRO DE SALUD XOCHITEPEC</option>
+            <option value="CENTRO SyGUE CUERNAVACA">CENTRO SyGUE CUERNAVACA</option>
+            <option value="CENTRO SyGUE TEMIXCO">CENTRO SyGUE TEMIXCO</option>
+            <option value="CNTRO DE SALUD CUAUHTEMOC">CNTRO DE SALUD CUAUHTEMOC</option>
+            <option value="SERVICIOS INTEGRALES PARA LA PREVENCIÓN Y ATENCIÓN DE LA DISCAPACIDAD POR DEFECTOS AL NACIMIENTO, TEMIXCO">SERVICIOS INTEGRALES PARA LA PREVENCIÓN Y ATENCIÓN DE LA DISCAPACIDAD POR DEFECTOS AL NACIMIENTO, TEMIXCO</option>
+            <option value="UEDO">UEDO</option>
+            <option value="UNEME CENTRO INTEGRAL DE SALUD MENTAL, EMILIANO ZAPATA">UNEME CENTRO INTEGRAL DE SALUD MENTAL, EMILIANO ZAPATA</option>
+            <option value="UNEME ENFERMEDADES CRÓNICOS, CUERNAVACA">UNEME ENFERMEDADES CRÓNICOS, CUERNAVACA</option>
+            <option value="CAPASITS CUERNAVACA">CAPASITS CUERNAVACA</option>
+            <option value="CENTRO COMUNITARIO DE SALUD MENTAL Y ADICCIONES CUERNAVACA">CENTRO COMUNITARIO DE SALUD MENTAL Y ADICCIONES CUERNAVACA</option>
+            <option value="CENTRO COMUNITARIO DE SALUD MENTAL Y ADICCIONES TEMIXCO">CENTRO COMUNITARIO DE SALUD MENTAL Y ADICCIONES TEMIXCO</option>
+            <option value="CENTRO COMUNITARIO DE SALUD MENTAL Y ADICCIONES JIUTEPEC">CENTRO COMUNITARIO DE SALUD MENTAL Y ADICCIONES JIUTEPEC</option>
+            <option value="CENTRO COMUNITARIO DE SALUD MENTAL Y ADICCIONES XOCHITEPEC">CENTRO COMUNITARIO DE SALUD MENTAL Y ADICCIONES XOCHITEPEC</option>
+            <option value="CENTRO DE ATENCIÓN INTEGRAL PARA LA SALUD DEL ADOLESCENTE, XOCHITEPEC">CENTRO DE ATENCIÓN INTEGRAL PARA LA SALUD DEL ADOLESCENTE, XOCHITEPEC</option>
+            <option value="CENTRO DE ATENCIÓN PARA LA SALUD DE LA MUJER, CUERNAVACA">CENTRO DE ATENCIÓN PARA LA SALUD DE LA MUJER, CUERNAVACA</option>
+            <option value="CENTRO DE SALUD COL. EMILIANO ZAPATA">CENTRO DE SALUD COL. EMILIANO ZAPATA</option>
+            <option value="CENTRO DE SALUD DE TEPOZTLAN">CENTRO DE SALUD DE TEPOZTLAN</option>
+        </select>
+      </div>
+      <div class="col-lg-4 col-md-6 mb-3">
+        <label for="enfermeraSelect" class="form-label">Selecciona Enfermera/o:</label>
+        <select id="enfermeraSelect" class="form-select" disabled>
+          <option value="">-- Primero seleccione un centro --</option>
+        </select>
+      </div>
+      <div class="col-lg-4 col-md-12 mt-3 mt-lg-0 mb-3"> <div class="btn-action-wrapper">
+            <button id="btnIngresarProductividad" class="btn btn-ingresar-productividad" disabled>
+                <i class="bi bi-pencil-square"></i> Ingresar
+            </button>
+            <button id="btnConsultarProductividad" class="btn btn-consultar-productividad">
+                <i class="bi bi-search"></i> Consultar
+            </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="tablaContainer" class="row justify-content-center">
+    </div>
+  </main>
+
+  <footer class="footer-custom text-center mt-auto">
+    <p class="mb-0">Elaborado por <strong class="text-secondary">@Joshua Cordourier Rojas</strong></p>
+  </footer>
+
+  <div class="modal fade" id="consultarModal" tabindex="-1" aria-labelledby="consultarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: var(--ssm-dark-green); color: var(--ssm-text-on-dark);">
+          <h5 class="modal-title" id="consultarModalLabel">Consultar Productividad Enfermera/o</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="modalEnfermeraSelect" class="form-label">Selecciona Enfermera/o:</label>
+            <select id="modalEnfermeraSelect" class="form-select">
+              <option value="">-- Seleccione una enfermera/o --</option>
+            </select>
+          </div>
+          <div id="modalProductividadDataContainer">
+            <p class="text-muted">Seleccione una enfermera/o para ver su productividad.</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="background-color: #6c757d;">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+  </script>
+
+  <script>
+    const seccionIconos = {
+        "CURACIONES": "bi-file-medical",
+        "ESTOMATOLOGIA": "bi-virus",
+        "CEYE": "bi-prescription",
+        "ATENCIÓN PREVENTIVA INTEGRADA EN EL CURSO DE VIDA": "bi-heart-pulse",
+        "ATENCIÓN MATERNO INFANTIL": "bi-emoji-smile-fill",
+        "CLINICA DE HERIDAS": "bi-bandaid",
+        "ATENCIÓN HUMANA": "bi-people"
+    };
+    const estructura = {
+        "CURACIONES": [
+            [6, "Curación de sitio"], [7, "Aplicación de Inyecciones"], [8, "Hidratación Oral"], [9, "Toma de Signos Vitales"], [10, "Ministración de medicamentos"], [11, "Cambio de Sondas Vesicales"], [12, "Toma de Electrocardiograma"], [13, "Colocación de vendajes"], [14, "Orientación a los usuarios sobre el cuidado de su salud y prevención de enfermedades."]
+        ],
+        "ESTOMATOLOGIA": [
+            [15, "Apoyo asistencial al Estomatólogo en la técnica de 4 Manos"], [16, "Toma de Signos vitales"], [17, "Orientación al Tratamiento de Estomatología"], [18, "Orientación al paciente sobre la utilización de hilo dental"], [19, "Orientación al paciente sobre técnica de cepillado dental"], [20, "Orientación al paciente sobre utilización de enjuague bucal y revisión de tejidos."], [21, "Procedimiento de esterilización de instrumental"]
+        ],
+        "CEYE": [
+            [22, "Procedimientos de Esterilización de Instrumental"], [23, "Procedimientos de Esterilización de Material de Curación"], [24, "Procedimientos de Esterilización de Ropa Quirúrgica"], [25, "Procedimientos de Trasvasado"], [26, "Procedimientos de Desinfección de Alto Nivel"], [27, "Pruebas de Indicadores Biológicos en autoclaves"]
+        ],
+        "ATENCIÓN PREVENTIVA INTEGRADA EN EL CURSO DE VIDA": [
+            [28, "Entrega Informada de cartilla Nacional de salud"], [29, "Acciones de Promoción a la Salud de acuerdo a curso de vida"], [30, "Toma de Somatometría"], [31, "Evaluaciones Nutricionales"], [32, "Vacunas Aplicadas"], [33, "Orientaciones de Medidas Preventivas"], [34, "Toma de Glucosa Capilar"], [35, "Toma de hemoglobina Glicolisada"], [36, "Orientación a cuidador Primario en IRAS"], [37, "Orientación a cuidador Primario en EDA"], [38, "Toma de Presión Arterial"], [39, "Pruebas de PCR para identificación de VPH"], [40, "Citologías exfoliativas (Papanicolau)"], [41, "Exploraciones clínicas de MAMA en mujeres a partir de 25 años"], [42, "Pruebas rápidas de Antígeno Prostático"], [43, "Tomas de Espirometría"], [44, "Pruebas Rápidas de VIH"], [45, "Serie de Baciloscopias para detección de TBP"], [46, "Tratamientos Estrictamente Supervisados (TAES) en TBP"], [47, "Pruebas Tamizaje Neonatal Ampliado"], [48, "Pruebas de agudeza visual"], [49, "Aplicaciones de Implantes Subdérmicos"], [50,
+"No de Colocaciones de DIU"], [51, "No de Dotaciones de Condones femeninos y Masculinos"], [52, "Orientación y consejería sobre Métodos Anticonceptivos e ITS"]
+        ],
+        "ATENCIÓN MATERNO INFANTIL": [
+            [53, " Atenciones de Vigilancia Prenatal en embarazos de Bajo Riesgo "], [54, " Atenciones al niño sano  menor de 5 años "], [55, "Orientación a la Madre en lactancia Materna Exclusiva"], [56, " Pruebas EDI"], [57, " Capacitaciones en temas relacionados con la atención Materno Infantil"]
+        ],
+        "CLINICA DE HERIDAS": [
+            [58, "Total de atenciones a heridas crónicas y agudas"], [59, "Atención a Heridas de Pie Diabético"], [60, "Atención a Heridas úlceras arteriales y venosas"], [61, "Atenciones a Heridas de Úlceras por Presión"], [62, "Atenciones a otro tipo de herida."]
+        ],
+        "ATENCIÓN HUMANA": [
+            [63, "Vacunas aplicadas"], [64, "Visitas domiciliarias"], [65, "Atención Preventiva Integrada en el curso de vida extramuros"], [66, "Actividades de acciones preventivas en Escuelas"], [67, "Actividades de acciones preventivas en centros laborales"], [68, "Cercos Sanitarios"]
+        ]
+    };
+    let centroActual = "";
+    let enfermeraActual = "";
+    let datosOriginales = {};
+    let listaGlobalDeEnfermeras = [];
+    $(document).ready(function() {
+        google.script.run
+            .withSuccessHandler(function(data) {
+                document.getElementById("datoA2Display").innerText = data.a2;
+                document.getElementById("datoA3Display").innerText = data.a3;
+            })
+            .withFailureHandler(function(error) {
+                console.error("Error al cargar datos de A2 y A3: ", error.message);
+                document.getElementById("datoA2Display").innerText = "Error al cargar dato A2";
+                document.getElementById("datoA3Display").innerText = "Error al cargar dato A3";
+            })
+            .getHeaderData();
+
+        inicializarSelectsYControles();
+    });
+    function inicializarSelectsYControles() {
+        $('#centroSelect').select2({
+            placeholder: "Escriba o seleccione un centro",
+            allowClear: true, width: '100%', language: "es"
+        });
+        $('#enfermeraSelect').select2({
+            placeholder: "Seleccione una enfermera/o",
+            allowClear: true, width: '100%', language: "es"
+        });
+        $('#modalEnfermeraSelect').select2({
+            placeholder: "Seleccione una enfermera/o",
+            allowClear: true,
+            width: '100%',
+            language: "es",
+            dropdownParent: $('#consultarModal')
+        });
+        google.script.run
+            .withSuccessHandler(function(data) {
+                const selectEnf = $('#enfermeraSelect');
+                selectEnf.empty().append('<option value="">-- Seleccione una enfermera/o --</option>');
+                if (data.error) {
+                    console.error("Error al cargar enfermeras:", data.error);
+                    selectEnf.prop('disabled', true);
+                    Swal.fire("Error", "No se pudo cargar la lista de enfermeras: " + data.error, "error");
+                    listaGlobalDeEnfermeras = [];
+                } else if (data && data.length > 0) {
+                    listaGlobalDeEnfermeras = data;
+                    data.forEach(nombre => {
+                        selectEnf.append(new Option(nombre, nombre, false, false));
+                    });
+                    selectEnf.prop('disabled', false);
+                } else {
+                    selectEnf.prop('disabled', true);
+                    Swal.fire("Aviso", "No hay enfermeras/os listados para el mes actual o la hoja del mes no existe.", "info");
+                    listaGlobalDeEnfermeras = [];
+                }
+                selectEnf.trigger('change');
+            })
+            .withFailureHandler(function(error) {
+                console.error("Fallo al llamar getEnfermeras:", error.message);
+                $('#enfermeraSelect').prop('disabled', true).empty().append('<option value="">Error al cargar</option>').trigger('change');
+                Swal.fire("Error de Comunicación", "No se pudo obtener la lista de enfermeras del servidor.", "error");
+                listaGlobalDeEnfermeras = [];
+            })
+            .getEnfermeras();
+        $('#centroSelect, #enfermeraSelect').on('change', function() {
+            const centroVal = $('#centroSelect').val();
+            const enfermeraVal = $('#enfermeraSelect').val();
+            const btnIngresar = $('#btnIngresarProductividad');
+
+            if (centroVal && centroVal !== "" && enfermeraVal && enfermeraVal !== "") {
+                btnIngresar.prop('disabled', false);
+            } else {
+                btnIngresar.prop('disabled', true);
+                $("#tablaContainer").html("");
+            }
+        });
+        $('#btnIngresarProductividad').on('click', function() {
+            centroActual = $('#centroSelect').val();
+            enfermeraActual = $('#enfermeraSelect').val();
+            if (centroActual && enfermeraActual) {
+                mostrarFormulariosVacios();
+            } else {
+                Swal.fire("Información Incompleta", "Para ingresar productividad, debe seleccionar un centro y una enfermera/o.", "warning");
+            }
+        });
+        $('#btnConsultarProductividad').on('click', function() {
+            const selectedNurseFromMain = $('#enfermeraSelect').val();
+            const modalSelect = $('#modalEnfermeraSelect');
+
+            modalSelect.empty().append('<option value="">-- Seleccione una enfermera/o --</option>');
+
+            if (listaGlobalDeEnfermeras.length > 0) {
+                listaGlobalDeEnfermeras.forEach(nombre => {
+                    modalSelect.append(new Option(nombre, nombre, false, false));
+                });
+                if (selectedNurseFromMain) {
+                    modalSelect.val(selectedNurseFromMain).trigger('change');
+                } else {
+                     $('#modalProductividadDataContainer').html('<p class="text-muted">Seleccione una enfermera/o para ver su productividad.</p>');
+                }
+            } else {
+                 $('#modalProductividadDataContainer').html('<p class="text-danger">No hay lista de enfermeras disponible para seleccionar.</p>');
+            }
+
+            var consultarModal = new bootstrap.Modal(document.getElementById('consultarModal'));
+            consultarModal.show();
+        });
+
+        $('#modalEnfermeraSelect').on('change', function() {
+            const selectedNurseInModal = $(this).val();
+            if (selectedNurseInModal) {
+                loadAndDisplayNurseDataInModal(selectedNurseInModal);
+            } else {
+                $('#modalProductividadDataContainer').html('<p class="text-muted">Seleccione una enfermera/o para ver su productividad.</p>');
+            }
+        });
+
+        $('#centroSelect, #enfermeraSelect').on('select2:unselect', function () {
+            $("#tablaContainer").html("");
+            $('#btnIngresarProductividad').prop('disabled', true);
+            const guardarBtnGlobal = document.getElementById("guardarBtnContainerGlobal");
+            if (guardarBtnGlobal) guardarBtnGlobal.remove();
+        });
+    }
+
+    function loadAndDisplayNurseDataInModal(nurseName) {
+        const container = $('#modalProductividadDataContainer');
+        if (!nurseName) {
+            container.html('<p class="text-muted">Seleccione una enfermera/o para ver su productividad.</p>');
+            return;
+        }
+
+        container.html('<div class="d-flex justify-content-center align-items-center" style="min-height: 150px;"><div class="spinner-border text-primary" role="status" style="color: var(--ssm-vibrant-green) !important;"><span class="visually-hidden">Cargando...</span></div> <p class="ms-2 mb-0">Cargando datos...</p></div>');
+        google.script.run
+            .withSuccessHandler(function(response) {
+                if (response.error) {
+                    container.html(`<p class="text-danger">Error: ${response.error}</p>`);
+                } else if (response.data && response.data.length > 0) {
+                    let tableHtml =
+'<table class="table table-sm table-striped table-hover table-bordered"><thead><tr><th>Actividad</th><th>Valor</th></tr></thead><tbody>';
+                    response.data.forEach(item => {
+                        tableHtml += `<tr><td>${item.actividad}</td><td>${item.valor !== null && item.valor !== undefined ? item.valor : 'N/D'}</td></tr>`;
+                    });
+                    tableHtml += '</tbody></table>';
+                    container.html(tableHtml);
+                } else {
+                    container.html('<p class="text-info">No se encontraron datos de productividad para esta enfermera/o o no tiene actividades registradas.</p>');
+                }
+            })
+            .withFailureHandler(function(error) {
+                container.html(`<p class="text-danger">Error al comunicar con el servidor: ${error.message}</p>`);
+                Swal.fire("Error de Comunicación", `No se pudo obtener la productividad de la enfermera/o: ${error.message}`, "error");
+            })
+            .getNurseProductivityData(nurseName);
+    }
+
+    function mostrarFormulariosVacios() {
+        Swal.fire({
+            title: 'Cargando Formularios...',
+            text: 'Por favor, espere.',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+        const contenedor = document.getElementById("tablaContainer");
+        contenedor.innerHTML = "";
+        datosOriginales = {};
+        for (const [seccion, items] of Object.entries(estructura)) {
+            items.forEach(([fila, _]) => {
+                datosOriginales[fila] = "";
+            });
+            const colDiv = document.createElement("div");
+            colDiv.className = "col-lg-8";
+            const card = document.createElement("div");
+            card.className = "card-custom";
+            const header = document.createElement("div");
+            header.className = "card-header-custom";
+            const iconoClase = seccionIconos[seccion] || "bi-journal-medical";
+            header.innerHTML = `<i class="bi ${iconoClase}"></i> ${seccion}`;
+            card.appendChild(header);
+
+            const cardBody = document.createElement("div");
+            cardBody.className = "card-body-custom";
+            const rowDiv = document.createElement("div");
+            rowDiv.className = "row";
+            items.forEach(([fila, titulo]) => {
+                const colInput = document.createElement("div");
+                colInput.className = "col-12 col-md-6 mb-3";
+                colInput.innerHTML = `
+                    <label for="input-${fila}" class="form-label">${titulo}</label>
+                    <input type="number" class="form-control" id="input-${fila}" data-fila="${fila}" value="" oninput="verificarCambios()" min="0">
+                `;
+                rowDiv.appendChild(colInput);
+            });
+            cardBody.appendChild(rowDiv);
+            card.appendChild(cardBody);
+            colDiv.appendChild(card);
+            contenedor.appendChild(colDiv);
+        }
+
+        let existingBtnContainer = document.getElementById("guardarBtnContainerGlobal");
+        if (existingBtnContainer) existingBtnContainer.remove();
+        const btnContainerGlobal = document.createElement("div");
+        btnContainerGlobal.id = "guardarBtnContainerGlobal";
+        btnContainerGlobal.className = "col-lg-8 mx-auto mt-4 pt-3 border-top";
+        const innerButtonDiv = document.createElement("div");
+        innerButtonDiv.className = "text-end";
+        innerButtonDiv.innerHTML = `
+            <button class="btn btn-save-integrated" onclick="confirmarGuardado()" id="guardarBtn" disabled>
+                <i class="bi bi-save"></i> Guardar Cambios
+            </button>
+        `;
+        btnContainerGlobal.appendChild(innerButtonDiv);
+        contenedor.appendChild(btnContainerGlobal);
+
+        Swal.close();
+        verificarCambios();
+    }
+
+    function verificarCambios() {
+        const inputs = document.querySelectorAll("#tablaContainer input[data-fila]");
+        const guardarBtn = document.getElementById("guardarBtn");
+        let hayAlgoIngresado = false;
+        if (!guardarBtn) return;
+        inputs.forEach(input => {
+            if (input.value.trim() !== "") {
+                hayAlgoIngresado = true;
+            }
+        });
+        guardarBtn.disabled = !hayAlgoIngresado;
+    }
+
+    function confirmarGuardado() {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Se guardarán los datos ingresados para '" + centroActual + "' por '" + enfermeraActual + "'. Estos valores se sumarán a los existentes.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: 'var(--ssm-vibrant-green)',
+            cancelButtonColor: 'var(--ssm-accent-red)',
+            confirmButtonText: 'Sí, guardar',
+            cancelButtonText: 'No, cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                guardarDatosEnServidor();
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                Swal.fire('Cancelado', 'Puedes seguir editando o ingresando datos.', 'info');
+            }
+        });
+    }
+
+    function guardarDatosEnServidor() {
+        const inputs = document.querySelectorAll("#tablaContainer input[data-fila]");
+        const datosParaEnviar = [];
+
+        inputs.forEach(input => {
+            const fila = parseInt(input.getAttribute("data-fila"));
+            const valor = input.value.trim() === "" ? "0" : input.value;
+            datosParaEnviar.push({ fila, valor });
+        });
+        const algunValorSignificativo = datosParaEnviar.some(d => parseFloat(d.valor) !== 0);
+        if (!algunValorSignificativo && datosParaEnviar.length > 0) {
+            console.log("Todos los valores son cero, se procederá con el guardado.")
+        }
+
+        Swal.fire({
+            title: 'Guardando...',
+            text: 'Los datos se están procesando. Esto puede tardar un momento.',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+        google.script.run
+            .withSuccessHandler((response) => {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Guardado Exitoso!',
+                    text: response.message,
+                    confirmButtonColor: 'var(--ssm-dark-green)'
+                });
+                const guardarBtn = document.getElementById("guardarBtn");
+                if (guardarBtn) guardarBtn.disabled = true;
+
+                const formInputs = document.querySelectorAll("#tablaContainer input[data-fila]");
+                formInputs.forEach(input => {
+                    input.value = "";
+                });
+                verificarCambios();
+            })
+            .withFailureHandler(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al Guardar',
+                    text: 'No se pudieron guardar los cambios: ' + error.message,
+                    confirmButtonColor: 'var(--ssm-dark-green)'
+                });
+            })
+            .guardarDatos(centroActual, enfermeraActual, datosParaEnviar);
+    }
+  </script>
+</body>
+
+</html>
